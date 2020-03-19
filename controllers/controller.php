@@ -32,6 +32,15 @@ foreach ($_POST as $key => $value) {
 
 $user = getAuthenticatedUser();
 
+//here we define certain actions each logged in user can perform.
+$autorizations = [
+  'administrator' => ['create_user','delete_user']
+];
+
+function authorized(Array $post, $role){
+  global $autorizations;
+  return isset($autorizations[$role]) && in_array($post['action']??'', $autorizations[$role]);
+}
 
 function addSuccessAlertToSession($success_msg){
    if(isset($_SESSION["success"])){

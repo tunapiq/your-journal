@@ -18,7 +18,14 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="ml-auto">
-        <h5 class="text-light"> User (role)</h5>
+      <div class="ml-auto clearfix">
+        <?php if(isset($user)){ ?>
+
+        <h5 class="text-light"> <?php echo "Hi, ". $user['data']['name'] ;?>
+           &nbsp; <a class="text-muted pull-right" href="logout.php"> [Logout]</a>
+        </h5>
+      <?php }else{ ?>
+        <h5 class="text-light"> Not Logged In</h5>
+        <?php }?>
       </div>
     </nav>

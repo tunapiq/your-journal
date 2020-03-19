@@ -4,7 +4,7 @@ CREATE TABLE `user` (
     `phone` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
-    CONSTRAINT user_email_uk UNIQUE(email),
+    CONSTRAINT user_email_password_uk UNIQUE(email, password),
     CONSTRAINT user_id_pk PRIMARY KEY(id)
 );
 
