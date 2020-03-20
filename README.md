@@ -1,5 +1,5 @@
 # Installation Guide
-- ensure you have php ~7.2.0 installed. Do not use php 7.4
+- ensure you have php ~7.2.0 installed.
 - install xampp with mysql (see youtube for help if needed)
 - lookup how to setup a website in localhost using xampp on youtube
 - create a mysql database with any name you like
