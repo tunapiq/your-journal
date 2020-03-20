@@ -15,6 +15,10 @@ CREATE TABLE `administrator`(
    CONSTRAINT administrator_user_id_fk FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+INSERT INTO `user`(`name`, `phone`, `email`, `password`) VALUES ('james', '403-483-7500','aberefajames@yahoo.com','password');
+
+INSERT INTO `administrator`(`user_id`) VALUES (1);
+
 CREATE TABLE `researcher`(
   `id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
 	`user_id` INT UNSIGNED NOT NULL,
@@ -34,4 +38,44 @@ CREATE TABLE `editor`(
 	`user_id` INT UNSIGNED NOT NULL,
    CONSTRAINT editor_id_pk PRIMARY KEY(id),
    CONSTRAINT editor_user_id_fk FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE `paper`(
+  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
+  `researcher_id` INT UNSIGNED NOT NULL,
+  `status`ENUM('WAITING','PUBLISHED','WITHDRAWN') DEFAULT 'WAITING',
+	`title` VARCHAR(191) NOT NULL,
+  `author` VARCHAR(191) NOT NULL,
+  `article` TEXT NOT NULL,
+   CONSTRAINT paper_id_pk PRIMARY KEY(id),
+   CONSTRAINT paper_researcher_id_fk FOREIGN KEY (researcher_id) REFERENCES researcher(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE `paper_editor`(
+  `paper_id` INT UNSIGNED NOT NULL,
+	`editor_id` INT UNSIGNED NOT NULL,
+   CONSTRAINT paper_editor_paper_id_fk FOREIGN KEY (paper_id) REFERENCES paper(id) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT paper_editor_editor_id_fk FOREIGN KEY (editor_id) REFERENCES editor(id) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT paper_editor_pk PRIMARY KEY(paper_id, editor_id)
+);
+
+CREATE TABLE `paper_reviewer`(
+  `paper_id` INT UNSIGNED NOT NULL,
+	`reviewer_id` INT UNSIGNED NOT NULL,
+   CONSTRAINT paper_reviewer_paper_id_fk FOREIGN KEY (paper_id) REFERENCES paper(id) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT paper_reviewer_reviewer_id_fk FOREIGN KEY (reviewer_id) REFERENCES reviewer(id) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT paper_editor_pk PRIMARY KEY(paper_id, reviewer_id)
+);
+
+CREATE TABLE `researcher_editor_withdrawal`(
+  `paper_id` INT UNSIGNED NOT NULL,
+	`editor_id` INT UNSIGNED NOT NULL,
+  `researcher_id` INT UNSIGNED NOT NULL,
+  `status` ENUM('WAITING','APPROVED','REJECTED') DEFAULT 'WAITING',
+  `researcher_comment` TEXT NOT NULL,
+  `editor_comment` TEXT,
+   CONSTRAINT researcher_editor_withdrawal_paper_id_fk FOREIGN KEY (paper_id) REFERENCES paper(id) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT researcher_editor_withdrawal_editor_id_fk FOREIGN KEY (editor_id) REFERENCES editor(id) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT researcher_editor_withdrawal_researcher_id_fk FOREIGN KEY (researcher_id) REFERENCES researcher(id) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT researcher_editor_withdrawal_pk PRIMARY KEY(paper_id, editor_id, researcher_id)
 );

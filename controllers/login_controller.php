@@ -63,7 +63,7 @@ if(!empty($_POST)){
 
  //NOTE: we skip additional server side input validation and delegate it to the DB, html5 form validation is used on client side.
 
- $statement = $conn -> prepare("SELECT * FROM `user` AS usr WHERE `email` = ? AND `password` = ? AND EXISTS(SELECT * FROM `$role` as role WHERE usr.id = role.user_id)");
+ $statement = $conn -> prepare("SELECT usr.*,role.id as role_id FROM `user` AS usr,`$role` as role WHERE `email` = ? AND `password` = ? AND usr.id = role.user_id");
  $statement -> bind_param("ss", $email, $pass);
  //run the sql
  $statement -> execute();
@@ -76,10 +76,10 @@ if(!empty($_POST)){
    //start keeping track of the user (log user into the application)
    addUserToSession($account, $role);
    //redirect to dashboard page
-   header("Location: dashboard.php");
+   header("Location: dashboard.php?tab=1");
  }else{
    //add one time alert to session
-   addErrorAlertToSession("Invalid email or password for $user_type.");
+   addErrorAlertToSession("Invalid email/password combination for $user_type.");
  }
  $statement -> close();
 

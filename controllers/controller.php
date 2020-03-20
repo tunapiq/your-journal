@@ -34,8 +34,19 @@ $user = getAuthenticatedUser();
 
 //here we define certain actions each logged in user can perform.
 $autorizations = [
-  'administrator' => ['create_user','delete_user']
+  'administrator' => ['create_user','delete_user','assign_editor','unassign_editor'],
+  'researcher' => ['create_paper']
 ];
+
+
+function doExitRedirect($location, $conn = NULL){
+  //close any open db connection
+  if(isset($conn)) $conn -> close();
+  //redirect
+  header("Location: $location");
+  //stop execution of script
+  exit();
+}
 
 function authorized(Array $post, $role){
   global $autorizations;
