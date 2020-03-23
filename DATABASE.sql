@@ -61,6 +61,7 @@ CREATE TABLE `paper_editor`(
 
 CREATE TABLE `paper_reviewer`(
   `paper_id` INT UNSIGNED NOT NULL,
+  `revision_deadline` DATE NOT NULL,
 	`reviewer_id` INT UNSIGNED NOT NULL,
    CONSTRAINT paper_reviewer_paper_id_fk FOREIGN KEY (paper_id) REFERENCES paper(id) ON DELETE CASCADE ON UPDATE CASCADE,
    CONSTRAINT paper_reviewer_reviewer_id_fk FOREIGN KEY (reviewer_id) REFERENCES reviewer(id) ON DELETE CASCADE ON UPDATE CASCADE,

@@ -50,6 +50,9 @@ switch ($user['role']) {
 	case 'researcher':
 	performResearcherAction();
 	break;
+	case 'editor':
+	performEditorAction();
+	break;
 	default: break;
 }
 
@@ -57,23 +60,57 @@ switch ($user['role']) {
 
 
 if($user['role'] == 'administrator'){
-	//load admin dashboard data
+	//load tab content
+switch ($_GET['tab'] ?? 1) {
+	//load tab 2 content
+	case 2:
 	$user_types = [
 		'administrator' => $conn -> query("SELECT user.*,administrator.id as role_id FROM user,administrator WHERE user.id=administrator.user_id"),
 		'editor' => $conn -> query("SELECT user.*,editor.id as role_id FROM user,editor WHERE user.id=editor.user_id"),
 		'researcher' => $conn -> query("SELECT user.*,researcher.id as role_id FROM user,researcher WHERE user.id=researcher.user_id"),
 		'reviewer' => $conn -> query("SELECT user.*,reviewer.id as role_id FROM user,reviewer WHERE user.id=reviewer.user_id"),
 	];
-
+	break;
+	//load tab 3 content
+	case 3:
 	$papers  = $conn -> query("SELECT * FROM paper ORDER BY `id` DESC");
 	$editors = $conn -> query("SELECT ed.id, usr.name FROM editor AS ed LEFT JOIN user as usr ON usr.id = ed.user_id ORDER BY ed.id DESC");
 	$paper_editors = $conn -> query("SELECT pe.*,u.name AS editor_name,p.title AS paper_title FROM paper_editor AS pe, paper AS p, editor AS e, user as u WHERE u.id = e.user_id AND p.id = pe.paper_id AND e.id = pe.editor_id");
+	break;
+	//load tab 4 content
+	case 4:
+	$papers  = $conn -> query("SELECT * FROM paper ORDER BY `id` DESC");
+	break;
+
+	default: break;
+}
 
 }else if($user['role'] == 'researcher'){
-  //load researcher dashboard data
-	$researcher_papers = $conn -> query("SELECT * FROM paper WHERE researcher_id = '".$user['data']['role_id']."' ORDER BY `id` DESC");
-
-	$paper_editors = $conn -> query("SELECT pe.*,u.name AS editor_name,p.title AS paper_title FROM paper_editor AS pe, paper AS p, editor AS e, user as u WHERE p.researcher_id = {$user['data']['role_id']} AND u.id = e.user_id AND p.id = pe.paper_id AND e.id = pe.editor_id");
+	switch ($_GET['tab'] ?? 1) {
+		//load tab 2 content
+		case 2:
+		$paper_editors = $conn -> query("SELECT pe.*,u.name AS editor_name,p.title AS paper_title FROM paper_editor AS pe, paper AS p, editor AS e, user as u WHERE p.researcher_id = {$user['data']['role_id']} AND u.id = e.user_id AND p.id = pe.paper_id AND e.id = pe.editor_id");
+		break;
+		//load tab 4 content
+		case 4:
+		$researcher_papers = $conn -> query("SELECT * FROM paper WHERE researcher_id = '".$user['data']['role_id']."' ORDER BY `id` DESC");
+		break;
+		default: break;
+	}
+}else if($user['role'] == 'editor'){
+	switch ($_GET['tab'] ?? 1) {
+		//load tab 1 content
+		case 1:
+		$editor_papers  = $conn -> query("SELECT p.* FROM paper AS p,paper_editor AS pe WHERE p.id = pe.paper_id AND pe.editor_id = '".$user['data']['role_id']."' ORDER BY p.id DESC");
+		break;
+		//load tab 2 content
+		case 2:
+		$editor_papers  = $conn -> query("SELECT p.* FROM paper AS p,paper_editor AS pe WHERE p.id = pe.paper_id AND pe.editor_id = '".$user['data']['role_id']."' ORDER BY p.id DESC");
+		$reviewers = $conn -> query("SELECT ed.id, usr.name FROM reviewer AS ed LEFT JOIN user as usr ON usr.id = ed.user_id ORDER BY ed.id DESC");
+		$paper_reviewers = $conn -> query("SELECT pe.*,u.name AS reviewer_name,p.title AS paper_title FROM paper_reviewer AS pe, paper AS p, reviewer AS e, user as u WHERE u.id = e.user_id AND p.id = pe.paper_id AND e.id = pe.reviewer_id");
+		break;
+		default: break;
+	}
 }
 
 
@@ -87,6 +124,46 @@ $conn->close();
 // 	d - double
 // 	s - string
 // 	b - BLOB
+
+function performEditorAction(){
+	global $conn, $user;
+	switch ($_POST['action']) {
+		case 'assign_reviewer':
+		$reviewer_id = $_POST["reviewer_id"]??NULL;
+		$paper_id  = $_POST["paper_id"]??NULL;
+		$revision_deadline = $_POST["revision_deadline"]??NULL;
+		$statement = $conn -> prepare("INSERT INTO `paper_reviewer`(`paper_id`, `reviewer_id`,`revision_deadline`) VALUES (?, ?, ?)");
+		$statement -> bind_param("iis", $paper_id, $reviewer_id, $revision_deadline);
+		//run the sql
+		if($statement -> execute() === TRUE){
+			//add one time alert to session
+			addSuccessAlertToSession("Reviewer assigned to paper.");
+		}else{
+			//add one time alert to session
+			addErrorAlertToSession("Unable to assign reviewer to paper. {$conn->error}");
+		}
+		$statement -> close();
+		doExitRedirect("dashboard.php?tab=2", $conn);
+
+		case 'unassign_reviewer':
+		$reviewer_id = $_POST["reviewer_id"]??NULL;
+		$paper_id  = $_POST["paper_id"]??NULL;
+		$statement = $conn -> prepare("DELETE FROM `paper_reviewer` WHERE `paper_id` = ? AND `reviewer_id` = ?");
+		$statement -> bind_param("ii", $paper_id, $reviewer_id);
+		//run the sql
+		if($statement -> execute() === TRUE){
+		  //add one time alert to session
+		  addSuccessAlertToSession("Paper reviewer removed from paper.");
+		}else{
+		  //add one time alert to session
+		  addErrorAlertToSession("Unable to remove paper reviewer. {$conn->error}");
+		}
+		$statement -> close();
+		doExitRedirect("dashboard.php?tab=2", $conn);
+
+		default: break;
+	}
+}
 
 function performResearcherAction(){
 	global $conn, $user;
@@ -195,7 +272,7 @@ function performAdminAction(){
 			//run the sql
 			if($statement -> execute() === TRUE){
 				//add one time alert to session
-				addSuccessAlertToSession("Paper editor unassigned.");
+				addSuccessAlertToSession("Paper editor removed from paper.");
 			}else{
 				//add one time alert to session
 				addErrorAlertToSession("Unable to unassigned paper editor. {$conn->error}");

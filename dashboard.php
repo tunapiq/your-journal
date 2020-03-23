@@ -26,6 +26,5 @@ include_once('controllers/dashboard_controller.php');
   </section>
 
   <?php
-   $hide_footer_nav = true;
    include_once('partials/footer.php');
   ?>

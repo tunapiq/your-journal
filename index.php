@@ -51,6 +51,7 @@
 
             </form>
 
+            <p class="p-4 pt-5 text-center text-muted">&copy; 2020, All Rights Reserved. Group 16.</p>
           </div>
         </div>
       </div>

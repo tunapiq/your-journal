@@ -35,7 +35,8 @@ $user = getAuthenticatedUser();
 //here we define certain actions each logged in user can perform.
 $autorizations = [
   'administrator' => ['create_user','delete_user','assign_editor','unassign_editor'],
-  'researcher' => ['create_paper']
+  'researcher' => ['create_paper'],
+  'editor' => ['assign_reviewer','unassign_reviewer']
 ];
 
 
