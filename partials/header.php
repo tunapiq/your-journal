@@ -13,7 +13,7 @@
   <body>
 
     <nav class="navbar navbar-expand navbar-dark bg-dark">
-      <a class="navbar-brand" href="#"><h1 class="text-white">UofW Journal</h1></a>
+      <a class="navbar-brand" href="#"><h2 class="text-white">UofW Journal</h2></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -21,11 +21,11 @@
       <div class="ml-auto clearfix">
         <?php if(isset($user)){ ?>
 
-        <h5 class="text-light"> <?php echo "Hi, ". $user['data']['name'] ;?>
+        <h6 class="text-light"> <?php echo "Hi, ". $user['data']['name'] ;?>
            &nbsp; <a class="text-muted pull-right" href="logout.php"> [Logout]</a>
-        </h5>
+        </h6>
       <?php }else{ ?>
-        <h5 class="text-light"> Not Logged In</h5>
+        <h6 class="text-light"> Not Logged In</h6>
         <?php }?>
       </div>
     </nav>
