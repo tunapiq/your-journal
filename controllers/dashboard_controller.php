@@ -91,6 +91,10 @@ switch ($_GET['tab'] ?? 1) {
 		case 2:
 		$paper_editors = $conn -> query("SELECT pe.*,u.name AS editor_name,p.title AS paper_title FROM paper_editor AS pe, paper AS p, editor AS e, user as u WHERE p.researcher_id = {$user['data']['role_id']} AND u.id = e.user_id AND p.id = pe.paper_id AND e.id = pe.editor_id");
 		break;
+		//load tab 3 content
+		case 3:
+		$paper_reviewers = $conn -> query("SELECT pr.*,u.name AS reviewer_name,p.title AS paper_title FROM paper_reviewer AS pr, paper AS p, reviewer AS r, user as u WHERE p.researcher_id = {$user['data']['role_id']} AND u.id = r.user_id AND p.id = pr.paper_id AND r.id = pr.reviewer_id");
+		break;
 		//load tab 4 content
 		case 4:
 		$researcher_papers = $conn -> query("SELECT * FROM paper WHERE researcher_id = '".$user['data']['role_id']."' ORDER BY `id` DESC");
@@ -101,7 +105,24 @@ switch ($_GET['tab'] ?? 1) {
 	switch ($_GET['tab'] ?? 1) {
 		//load tab 1 content
 		case 1:
-		$editor_papers  = $conn -> query("SELECT p.* FROM paper AS p,paper_editor AS pe WHERE p.id = pe.paper_id AND pe.editor_id = '".$user['data']['role_id']."' ORDER BY p.id DESC");
+		if(isset($_GET['edit'])){
+			$pid = intval($_GET['paper_id']??-1);
+			$statement = $conn -> prepare("SELECT p.* FROM paper AS p WHERE EXISTS(SELECT * FROM paper_editor AS pe WHERE p.id = pe.paper_id AND pe.paper_id = ? AND pe.editor_id = '".$user['data']['role_id']."')");
+			$statement -> bind_param("i", $pid);
+			$statement -> execute();
+			$editable_paper  = $statement -> get_result();
+			//if the query returned any result
+			if($editable_paper -> num_rows > 0){
+				//convert the result to an associative array
+				$editable_paper = $editable_paper -> fetch_assoc();
+			}else{
+				$editable_paper = NULL;
+			}
+			$statement -> close();
+		}else{
+			$editor_papers  = $conn -> query("SELECT p.* FROM paper AS p,paper_editor AS pe WHERE p.id = pe.paper_id AND pe.editor_id = '".$user['data']['role_id']."' ORDER BY p.id DESC");
+		}
+
 		break;
 		//load tab 2 content
 		case 2:
@@ -110,6 +131,14 @@ switch ($_GET['tab'] ?? 1) {
 		$paper_reviewers = $conn -> query("SELECT pe.*,u.name AS reviewer_name,p.title AS paper_title FROM paper_reviewer AS pe, paper AS p, reviewer AS e, user as u WHERE u.id = e.user_id AND p.id = pe.paper_id AND e.id = pe.reviewer_id");
 		break;
 		default: break;
+	}
+}else if($user['role'] == 'reviewer'){
+	switch ($_GET['tab'] ?? 1) {
+	  //load tab 1 content
+	  case 1:
+	  $reviewer_papers  = $conn -> query("SELECT p.* FROM paper AS p,paper_reviewer AS pe WHERE p.id = pe.paper_id AND pe.reviewer_id = '".$user['data']['role_id']."' ORDER BY p.id DESC");
+	  break;
+	  default: break;
 	}
 }
 
@@ -161,6 +190,25 @@ function performEditorAction(){
 		$statement -> close();
 		doExitRedirect("dashboard.php?tab=2", $conn);
 
+		case 'update_paper':
+		$title      = $_POST["title"]??NULL;
+		$paper_id   = $_POST["paper_id"]??NULL;
+		$article    = $_POST["article"]??NULL;
+		$status     = $_POST["status"]??NULL;
+		$statement = $conn -> prepare("UPDATE `paper` AS p SET `title` = ?, `article` = ?, `status` = ? WHERE EXISTS(SELECT * FROM paper_editor AS pe WHERE p.id = pe.paper_id AND pe.paper_id = ? AND pe.editor_id = '".$user['data']['role_id']."')");
+		$statement -> bind_param("sssi", $title, $article, $status, $paper_id);
+		//run the sql
+		if($statement -> execute() === TRUE){
+			//add one time alert to session
+			addSuccessAlertToSession("Paper updated.");
+		}else{
+			//add one time alert to session
+			addErrorAlertToSession("Unable to update paper. {$conn->error}");
+		}
+		$statement -> close();
+		//redirect to the previous page
+		doExitRedirect("dashboard.php?".http_build_query($_GET), $conn);
+
 		default: break;
 	}
 }
@@ -184,21 +232,6 @@ function performResearcherAction(){
 		}
 		$statement -> close();
 		doExitRedirect("dashboard.php?tab=1", $conn);
-		// case 'delete_user':
-		// $user_id      = $_POST["id"]??NULL;
-		// $statement = $conn -> prepare("DELETE FROM `user` WHERE `id` = ?");
-		// $statement -> bind_param("i", $user_id);
-		// //run the sql
-		// if($statement -> execute() === TRUE){
-		// 	//add one time alert to session
-		// 	addSuccessAlertToSession("User deleted.");
-		// }else{
-		// 	//add one time alert to session
-		// 	addErrorAlertToSession("Unable to delete user. {$conn->error}");
-		// }
-		// $statement -> close();
-		// break;
-
 		default: break;
 	}
 }

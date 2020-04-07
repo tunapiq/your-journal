@@ -17,7 +17,7 @@
            <input type="hidden" name="tab" value="2">
            <input type="hidden" name="editor_id" value="<?php echo $paper_editor['editor_id']; ?>"/>
            <input type="hidden" name="paper_id" value="<?php echo $paper_editor['paper_id']; ?>"/>
-           <button class="btn btn-sm">View Editor Comments</button>
+           <a href="paper-comments.php?paper_id=<?php echo $paper_editor['paper_id']; ?>" class="btn btn-sm">View Paper Comments</a>
           </form>
         </div>
       </div>

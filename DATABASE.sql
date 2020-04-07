@@ -68,6 +68,15 @@ CREATE TABLE `paper_reviewer`(
    CONSTRAINT paper_editor_pk PRIMARY KEY(paper_id, reviewer_id)
 );
 
+CREATE TABLE `comment`(
+  `paper_id` INT UNSIGNED NOT NULL,
+  `user_id` INT UNSIGNED NOT NULL,
+	`comment` TEXT NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   CONSTRAINT comment_paper_id_fk FOREIGN KEY (paper_id) REFERENCES paper(id) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT comment_user_id_fk FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE `researcher_editor_withdrawal`(
   `paper_id` INT UNSIGNED NOT NULL,
 	`editor_id` INT UNSIGNED NOT NULL,

@@ -2,8 +2,6 @@
   <h5 class="mb-5 mt-5">Researcher Papers (<?php echo $papers -> num_rows; ?>)</h5>
   <div class="row">
   <?php
-  //reset position to 0 since we already used this object previously.
-  $papers -> data_seek(0);
   while($paper = $papers -> fetch_assoc()) {?>
     <div class="col-md-12 mb-5">
       <div class="card p-0">
@@ -15,6 +13,9 @@
           <li class="list-group-item clearfix"><small class="text-muted">Status</small> <br> <?php echo $paper['status']; ?></li>
           <li class="list-group-item clearfix"><small class="text-muted">Article</small> <br> <?php echo nl2br($paper['article']); ?></li>
         </ul>
+        <div class="p-2 pr-3 text-right">
+          <a href="paper-comments.php?paper_id=<?php echo $paper['id']; ?>" class="btn btn-sm">View Paper Comments</a>
+        </div>
       </div>
     </div>
   <?php }?>

@@ -36,7 +36,8 @@ $user = getAuthenticatedUser();
 $autorizations = [
   'administrator' => ['create_user','delete_user','assign_editor','unassign_editor'],
   'researcher' => ['create_paper'],
-  'editor' => ['assign_reviewer','unassign_reviewer']
+  'editor' => ['assign_reviewer','unassign_reviewer','update_paper','post_comment'],
+  'reviewer' => ['post_comment']
 ];
 
 
