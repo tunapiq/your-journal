@@ -136,7 +136,7 @@ switch ($_GET['tab'] ?? 1) {
 	switch ($_GET['tab'] ?? 1) {
 	  //load tab 1 content
 	  case 1:
-	  $reviewer_papers  = $conn -> query("SELECT p.* FROM paper AS p,paper_reviewer AS pe WHERE p.id = pe.paper_id AND pe.reviewer_id = '".$user['data']['role_id']."' ORDER BY p.id DESC");
+	  $reviewer_papers  = $conn -> query("SELECT p.*,pr.revision_deadline FROM paper AS p,paper_reviewer AS pr WHERE p.id = pr.paper_id AND pr.reviewer_id = '".$user['data']['role_id']."' ORDER BY p.id DESC");
 	  break;
 	  default: break;
 	}

@@ -6,6 +6,7 @@
         <div class="col-md-12 mb-5">
           <div class="card p-0">
             <ul class="list-group list-group-flush">
+              <li class="list-group-item clearfix"><small class="text-muted">Revision Deadline</small> <br> <?php echo date('M d, Y h:i A', strtotime($reviewer_paper['revision_deadline'])); ?></li>
               <li class="list-group-item clearfix"><small class="text-muted">Paper ID (PID)</small> <br> <?php echo $reviewer_paper['id']; ?></li>
               <li class="list-group-item clearfix"><small class="text-muted">Researcher Role ID</small> <br> <?php echo 'researcher-'.$reviewer_paper['researcher_id']; ?></li>
               <li class="list-group-item clearfix"><small class="text-muted">Title</small> <br> <?php echo $reviewer_paper['title']; ?></li>
